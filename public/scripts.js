@@ -26,15 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h2>Create a Campaign</h2>
                 <div class="form-group">
                     <label for="campaign-title">Campaign Title</label>
-                    <input type="text" id="campaign-title" placeholder="Enter campaign title">
+                    <input type="text" id="campaign-title" placeholder="Enter campaign title" required>
                 </div>
                 <div class="form-group">
                     <label for="campaign-description">Description</label>
-                    <textarea id="campaign-description" placeholder="Describe your campaign"></textarea>
+                    <textarea id="campaign-description" placeholder="Describe your campaign" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="campaign-industry">Industry</label>
-                    <select id="campaign-industry">
+                    <select id="campaign-industry" required>
                         <option value="fashion">Fashion & Beauty</option>
                         <option value="food">Food & Beverage</option>
                         <option value="tech">Technology</option>
@@ -44,15 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="form-group">
                     <label for="campaign-budget">Budget (ETB)</label>
-                    <input type="number" id="campaign-budget" placeholder="Enter budget">
+                    <input type="number" id="campaign-budget" placeholder="Enter budget" min="1" required>
                 </div>
                 <div class="form-group">
                     <label for="campaign-tiktok">TikTok Profile URL</label>
-                    <input type="text" id="campaign-tiktok" placeholder="Enter your TikTok profile URL">
+                    <input type="url" id="campaign-tiktok" placeholder="Enter your TikTok profile URL" required>
                 </div>
                 <div class="form-group">
                     <label for="campaign-performance">Performance Model</label>
-                    <select id="campaign-performance">
+                    <select id="campaign-performance" required>
                         <option value="cpa">Cost Per Acquisition</option>
                         <option value="cpc">Cost Per Click</option>
                         <option value="cpe">Cost Per Engagement</option>
@@ -61,21 +61,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="form-group">
                     <label for="campaign-deadline">Deadline</label>
-                    <input type="date" id="campaign-deadline">
+                    <input type="date" id="campaign-deadline" required>
                 </div>
                 <button class="btn btn-primary" id="createCampaignBtn">Proceed to Payment</button>
             </div>
         </div>
     `;
     document.body.appendChild(campaignModal);
+    console.log('Campaign modal appended to DOM');
 
     // Helper function for API calls
     async function fetchWithErrorHandling(url, options) {
         try {
             console.log(`Fetching ${url} with options:`, options);
             const response = await fetch(url, options);
+            console.log(`Response from ${url}:`, response.status);
             const result = await response.json();
-            console.log(`Response from ${url}:`, result);
+            console.log(`Result from ${url}:`, result);
             if (!response.ok) {
                 throw new Error(result.message || `HTTP ${response.status}`);
             }
@@ -160,22 +162,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateAuthButtons() {
         console.log('Updating auth buttons');
         const authButtons = document.querySelector('.auth-buttons');
+        if (!authButtons) {
+            console.error('auth-buttons not found');
+            return;
+        }
         const token = localStorage.getItem('token');
+        authButtons.innerHTML = token ? `
+            <button class="btn btn-outline" id="logoutBtn">Logout</button>
+            <button class="btn btn-primary" id="campaignBtn">Create Campaign</button>
+        ` : `
+            <button class="btn btn-outline" id="loginBtn">Login</button>
+            <button class="btn btn-primary" id="registerBtn">Sign Up</button>
+        `;
         if (token) {
-            authButtons.innerHTML = `
-                <button class="btn btn-outline" id="logoutBtn">Logout</button>
-                <button class="btn btn-primary" id="campaignBtn">Create Campaign</button>
-            `;
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            document.getElementById('campaignBtn').addEventListener('click', () => {
+            document.getElementById('logoutBtn')?.addEventListener('click', logout);
+            document.getElementById('campaignBtn')?.addEventListener('click', () => {
                 console.log('Create campaign button clicked');
                 campaignModal.style.display = 'flex';
             });
         } else {
-            authButtons.innerHTML = `
-                <button class="btn btn-outline" id="loginBtn">Login</button>
-                <button class="btn btn-primary" id="registerBtn">Sign Up</button>
-            `;
             loginBtn = document.getElementById('loginBtn');
             registerBtn = document.getElementById('registerBtn');
             loginBtn?.addEventListener('click', () => {
@@ -282,6 +287,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }).then(({ campaigns }) => {
             const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
             campaignGrid.innerHTML = '';
+            if (campaigns.length === 0) {
+                campaignGrid.innerHTML = '<p>No campaigns found.</p>';
+                return;
+            }
             campaigns.forEach(campaign => {
                 const card = document.createElement('div');
                 card.className = 'card campaign-card';
@@ -328,20 +337,42 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        document.getElementById(tabName + '-tab').classList.add('active');
-        event.currentTarget.classList.add('active');
-        if (tabName === 'campaigns') loadCampaigns();
+        const tabElement = document.getElementById(tabName + '-tab');
+        if (tabElement) {
+            tabElement.classList.add('active');
+            event.currentTarget.classList.add('active');
+            if (tabName === 'campaigns') loadCampaigns();
+        } else {
+            console.error(`Tab ${tabName}-tab not found`);
+        }
     }
 
     // Load campaigns
     async function loadCampaigns(page = 1) {
         console.log(`Loading campaigns, page: ${page}`);
-        await fetchWithErrorHandling(`/api/campaigns?page=${page}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        }).then(({ campaigns, total, page: currentPage, pages }) => {
-            const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
+        const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
+        if (!campaignGrid) {
+            console.error('Campaign grid not found');
+            alert('Error: Campaign grid not found');
+            return;
+        }
+        campaignGrid.innerHTML = '<p>Loading campaigns...</p>';
+        try {
+            const response = await fetch(`/api/campaigns?page=${page}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            console.log('Campaigns API response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            const { campaigns, total, page: currentPage, pages } = await response.json();
+            console.log('Campaigns received:', campaigns);
             campaignGrid.innerHTML = '';
+            if (campaigns.length === 0) {
+                campaignGrid.innerHTML = '<p>No campaigns found.</p>';
+                return;
+            }
             campaigns.forEach(campaign => {
                 const card = document.createElement('div');
                 card.className = 'card campaign-card';
@@ -375,15 +406,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 campaignGrid.appendChild(card);
             });
             const pagination = document.createElement('div');
+            pagination.className = 'pagination';
             pagination.innerHTML = `
                 <button onclick="loadCampaigns(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
                 <span>Page ${currentPage} of ${pages}</span>
                 <button onclick="loadCampaigns(${currentPage + 1})" ${currentPage === pages ? 'disabled' : ''}>Next</button>
             `;
             campaignGrid.appendChild(pagination);
-        }).catch(error => {
-            console.error('Load campaigns failed:', error);
-        });
+        } catch (error) {
+            console.error('Error loading campaigns:', error);
+            campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again.</p>';
+            alert('Error loading campaigns: ' + error.message);
+        }
     }
 
     // Attach tab listeners
