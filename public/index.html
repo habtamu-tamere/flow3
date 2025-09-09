@@ -6,11 +6,9 @@
     <title>InfluenceEthiopia - UGC Marketing Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css"> 
-    <link rel="stylesheet" href="/style.css">   
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <div class="header-content">
@@ -35,161 +33,64 @@
         </div>
     </header>
 
-<!-- Hero Section -->
-<section class="hero">
-    <div class="container">
-        <h1>Drive Sales with Authentic Ethiopian Influencers</h1>
-        <p>Connect with top content creators in Ethiopia for user-generated content campaigns that deliver real results.</p>
-        <button class="btn btn-primary"><i class="fas fa-rocket"></i> Launch Your Campaign</button>
-    </div>
-</section>
-
-<!-- Main Content -->
-<section class="main-content">
-    <div class="container">
-        <div class="section-title">
-            <h2>Influencer Marketing Platform</h2>
-            <p>Discover campaigns and influencers tailored for the Ethiopian market</p>
+    <section class="hero">
+        <div class="container">
+            <h1>Drive Sales with Authentic Ethiopian Influencers</h1>
+            <p>Connect with top content creators in Ethiopia for user-generated content campaigns that deliver real results.</p>
+            <button class="btn btn-primary" id="launchCampaignBtn"><i class="fas fa-rocket"></i> Launch Your Campaign</button>
         </div>
+    </section>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('campaigns')">Campaigns</div>
-            <div class="tab" onclick="switchTab('influencers')">Influencers</div>
-        </div>
-
-        <!-- Campaigns Tab -->
-        <div id="campaigns-tab" class="tab-content active">
-            <div class="filters">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label for="industry">Industry</label>
-                        <select id="industry">
-                            <option value="">All Industries</option>
-                            <option value="fashion">Fashion & Beauty</option>
-                            <option value="food">Food & Beverage</option>
-                            <option value="tech">Technology</option>
-                            <option value="travel">Travel & Tourism</option>
-                            <option value="health">Health & Fitness</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="budget">Budget Range</label>
-                        <select id="budget">
-                            <option value="">Any Budget</option>
-                            <option value="micro">Micro (under $100)</option>
-                            <option value="small">Small ($100-$500)</option>
-                            <option value="medium">Medium ($500-$2,000)</option>
-                            <option value="large">Large ($2,000+)</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="performance">Performance Model</label>
-                        <select id="performance">
-                            <option value="">All Models</option>
-                            <option value="cpa">Cost Per Acquisition</option>
-                            <option value="cpc">Cost Per Click</option>
-                            <option value="cpe">Cost Per Engagement</option>
-                            <option value="fixed">Fixed Rate</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn btn-primary">Apply Filters</button>
+    <section class="main-content">
+        <div class="container">
+            <div class="section-title">
+                <h2>Influencer Marketing Platform</h2>
+                <p>Discover campaigns and influencers tailored for the Ethiopian market</p>
             </div>
-
-            <div class="card-grid">
-                <!-- Campaign 1 -->
-                <div class="card campaign-card">
-                    <div class="card-header">
-                        <h3>Ethio Fashion Week</h3>
-                        <span class="campaign-badge">Fixed + CPA</span>
-                    </div>
-                    <div class="card-body">
-                        <p>Promote traditional Ethiopian fashion with authentic content. Pay per engagement plus commission on sales.</p>
-                        <div class="niche-tags">
-                            <span class="niche-tag">Fashion</span>
-                            <span class="niche-tag">Lifestyle</span>
-                            <span class="niche-tag">Culture</span>
-                        </div>
-                        <div class="stats">
-                            <div class="stat">
-                                <span class="stat-value">$500 + 5%</span>
-                                <span class="stat-label">Base + Commission</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value">28</span>
-                                <span class="stat-label">Applications</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <span>Deadline: Jun 30, 2023</span>
-                        <button class="btn btn-primary btn-sm">Apply Now</button>
-                    </div>
-                </div>
-
-                <!-- Campaign 2 -->
-                <div class="card campaign-card">
-                    <div class="card-header">
-                        <h3>Buna Time Coffee</h3>
-                        <span class="campaign-badge">CPC</span>
-                    </div>
-                    <div class="card-body">
-                        <p>Create content around Ethiopian coffee culture. Drive traffic to our e-commerce site with your unique discount code.</p>
-                        <div class="niche-tags">
-                            <span class="niche-tag">Food & Drink</span>
-                            <span class="niche-tag">Lifestyle</span>
-                            <span class="niche-tag">Culture</span>
-                        </div>
-                        <div class="stats">
-                            <div class="stat">
-                                <span class="stat-value">$0.25</span>
-                                <span class="stat-label">Per Click</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value">42</span>
-                                <span class="stat-label">Applications</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <span>Deadline: Jul 15, 2023</span>
-                        <button class="btn btn-primary btn-sm">Apply Now</button>
-                    </div>
-                </div>
-
-                <!-- Campaign 3 -->
-                <div class="card campaign-card">
-                    <div class="card-header">
-                        <h3>Addis Tech Gadgets</h3>
-                        <span class="campaign-badge">CPA</span>
-                    </div>
-                    <div class="card-body">
-                        <p>Review the latest tech gadgets available in Ethiopia. Earn commission on each sale generated through your content.</p>
-                        <div class="niche-tags">
-                            <span class="niche-tag">Technology</span>
-                            <span class="niche-tag">Gadgets</span>
-                            <span class="niche-tag">Reviews</span>
-                        </div>
-                        <div class="stats">
-                            <div class="stat">
-                                <span class="stat-value">15%</span>
-                                <span class="stat-label">Commission</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-value">19</span>
-                                <span class="stat-label">Applications</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <span>Deadline: Ongoing</span>
-                        <button class="btn btn-primary btn-sm">Apply Now</button>
-                    </div>
-                </div>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('campaigns')">Campaigns</div>
+                <div class="tab" onclick="switchTab('influencers')">Influencers</div>
+                <div class="tab" onclick="switchTab('influencers')">Video Editors</div>
             </div>
-        </div>
-
+            <div id="campaigns-tab" class="tab-content active">
+                <div class="filters">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="industry">Industry</label>
+                            <select id="industry">
+                                <option value="">All Industries</option>
+                                <option value="fashion">Fashion & Beauty</option>
+                                <option value="food">Food & Beverage</option>
+                                <option value="tech">Technology</option>
+                                <option value="travel">Travel & Tourism</option>
+                                <option value="health">Health & Fitness</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="budget">Budget Range</label>
+                            <select id="budget">
+                                <option value="">Any Budget</option>
+                                <option value="micro">Micro (under 15,000)</option>
+                                <option value="small">Small (15,000-100,000)</option>
+                                <option value="medium">Medium (100,000-300,000)</option>
+                                <option value="large">Large (300,000+)</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="performance">Performance Model</label>
+                            <select id="performance">
+                                <option value="">All Models</option>
+                                <option value="cpa">Cost Per Acquisition</option>
+                                <option value="cpc">Cost Per Click</option>
+                                <option value="cpe">Cost Per Engagement</option>
+                                <option value="fixed">Fixed Rate</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+                </div>
+                <div class="card-grid"></div>
+            </div>
         <!-- Influencers Tab -->
         <div id="influencers-tab" class="tab-content">
             <div class="filters">
@@ -219,10 +120,10 @@
                         <label for="rate">Rate Range</label>
                         <select id="rate">
                             <option value="">Any Rate</option>
-                            <option value="low">$50 - $200</option>
-                            <option value="medium">$200 - $500</option>
-                            <option value="high">$500 - $1,000</option>
-                            <option value="premium">$1,000+</option>
+                            <option value="low">8000 - 30,000</option>
+                            <option value="medium">30,000 - 100,000</option>
+                            <option value="high">100,000 - 150,000</option>
+                            <option value="premium">150,000+</option>
                         </select>
                     </div>
                 </div>
@@ -252,7 +153,7 @@
                                 <span class="stat-label">Engagement</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">$300</span>
+                                <span class="stat-value">50,000</span>
                                 <span class="stat-label">Rate/Post</span>
                             </div>
                         </div>
@@ -290,7 +191,7 @@
                                 <span class="stat-label">Engagement</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">$250</span>
+                                <span class="stat-value">40,000</span>
                                 <span class="stat-label">Rate/Post</span>
                             </div>
                         </div>
@@ -328,7 +229,7 @@
                                 <span class="stat-label">Engagement</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">$450</span>
+                                <span class="stat-value">80,000</span>
                                 <span class="stat-label">Rate/Post</span>
                             </div>
                         </div>
@@ -345,58 +246,57 @@
                 </div>
             </div>
         </div>
-    </div>
-</section>
+        </div>
+    </section>
 
-<!-- Auth Modals -->
-<div class="modal" id="loginModal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <div class="auth-form">
-            <h2>Login to Your Account</h2>
-            <div class="form-group">
-                <label for="login-email">Email</label>
-                <input type="email" id="login-email" placeholder="Enter your email">
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-form">
+                <h2>Login to Your Account</h2>
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <button class="btn btn-primary" id="loginSubmitBtn">Login</button>
+                <p>Don't have an account? <a href="#" id="switchToRegister">Register</a></p>
             </div>
-            <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" placeholder="Enter your password">
-            </div>
-            <button class="btn btn-primary">Login</button>
-            <p>Don't have an account? <a href="#" id="switchToRegister">Register</a></p>
         </div>
     </div>
-</div>
 
-<div class="modal" id="registerModal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <div class="auth-form">
-            <h2>Create an Account</h2>
-            <div class="form-group">
-                <label for="register-name">Full Name</label>
-                <input type="text" id="register-name" placeholder="Enter your full name">
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-form">
+                <h2>Create an Account</h2>
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="register-role">I am a:</label>
+                    <select id="register-role">
+                        <option value="brand">Brand/Business</option>
+                        <option value="influencer">Influencer/Creator</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="registerSubmitBtn">Create Account</button>
+                <p>Already have an account? <a href="#" id="switchToLogin">Login</a></p>
             </div>
-            <div class="form-group">
-                <label for="register-email">Email</label>
-                <input type="email" id="register-email" placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label for="register-password">Password</label>
-                <input type="password" id="register-password" placeholder="Create a password">
-            </div>
-            <div class="form-group">
-                <label for="register-role">I am a:</label>
-                <select id="register-role">
-                    <option value="brand">Brand/Business</option>
-                    <option value="influencer">Influencer/Creator</option>
-                </select>
-            </div>
-            <button class="btn btn-primary">Create Account</button>
-            <p>Already have an account? <a href="#" id="switchToLogin">Login</a></p>
         </div>
     </div>
-</div>
 
 <!-- Footer -->
 <footer>
@@ -429,7 +329,7 @@
                 <h3>Contact Us</h3>
                 <ul>
                     <li><i class="fas fa-map-marker-alt"></i> Addis Ababa, Ethiopia</li>
-                    <li><i class="fas fa-phone"></i> +251 123 456 789</li>
+                    <li><i class="fas fa-phone"></i> +251 962 1095 62</li>
                     <li><i class="fas fa-envelope"></i> info@influenceethiopia.com</li>
                 </ul>
             </div>
@@ -439,9 +339,7 @@
         </div>
     </div>
 </footer>
-<script src="/scripts.js"></script>
-<script src="scripts.js"></script>
+
+    <script src="scripts.js"></script>
 </body>
 </html>
-
-
