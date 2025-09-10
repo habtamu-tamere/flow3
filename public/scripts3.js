@@ -370,9 +370,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
 // Replace the loadCampaigns function in public/scripts.js
 async function loadCampaigns(page = 1) {
-    console.log(`[loadCampaigns] Starting, page: ${page}`);
+    console.log('[loadCampaigns] Starting, page:', page);
     const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
     if (!campaignGrid) {
         console.error('[loadCampaigns] Campaign grid not found in DOM');
@@ -383,7 +384,7 @@ async function loadCampaigns(page = 1) {
     campaignGrid.innerHTML = '<p>Loading campaigns...</p>';
 
     try {
-        console.log('[loadCampaigns] Fetching /api/campaigns?page=' + page);
+        console.log('[loadCampaigns] Fetching /api/campaigns?page=', page);
         const response = await fetch(`/api/campaigns?page=${page}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
@@ -452,11 +453,14 @@ async function loadCampaigns(page = 1) {
         console.log('[loadCampaigns] Campaigns rendered successfully');
     } catch (error) {
         console.error('[loadCampaigns] Error:', error);
-        campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again. Details: ' + error.message + '</p>';
-        alert('Error loading campaigns: ' + error.message);
+        if (data && data.error) {
+            campaignGrid.innerHTML = `<p>Error loading campaigns: ${data.error}. Please try again.</p>`;
+        } else {
+            campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again. Details: ' + error.message + '</p>';
+        }
+        alert('Error loading campaigns: ' + (data?.error || error.message));
     }
 }
-
     // Attach tab listeners
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
