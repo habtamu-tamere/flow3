@@ -11,7 +11,7 @@ const campaignSchema = new mongoose.Schema({
     deadline: { type: Date, required: true },
     creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     applications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    status: { type: String, enum: ['pending', 'active', 'completed'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'active', 'completed'], default: 'active' },
     createdAt: { type: Date, default: Date.now }
 });
 
