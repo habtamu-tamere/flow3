@@ -71,27 +71,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(campaignModal);
     console.log('Campaign modal appended to DOM');
 
-    const data = {
-    campaigns: [{
-        _id: "68c1324b6e393901bdf1881b",
-        title: "Apartment for sale ",
-        description: "Sales drive",
-        industry: "food",
-        budget: 15000,
-        tiktokUrl: "https://real.com",
-        performanceModel: "cpe",
-        deadline: new Date("2025-12-31T00:00:00Z").toISOString(),
-        applications: [],
-        status: "active"
-    }],
-    total: 1,
-    page: 1,
-    pages: 1
-};
-const response = { ok: true, status: 200 };
-// Skip to data processing...
-
-
+    // Helper function for API calls
+    async function fetchWithErrorHandling(url, options) {
+        try {
+            console.log(`Fetching ${url} with options:`, options);
+            const response = await fetch(url, options);
+            console.log(`Response from ${url}:`, response.status, response.statusText);
+            const result = await response.json();
+            console.log(`Result from ${url}:`, result);
+            if (!response.ok) {
+                throw new Error(result.message || `HTTP ${response.status}: ${response.statusText}`);
+            }
+            return result;
+        } catch (error) {
+            console.error(`Error fetching ${url}:`, error);
+            throw error;
+        }
+    }
 
     // Check if elements exist
     if (!loginBtn) console.error('loginBtn not found');
@@ -434,4 +430,54 @@ async function loadCampaigns(page = 1) {
                     <div class="niche-tags">
                         <span class="niche-tag">${campaign.industry || 'Unknown'}</span>
                     </div>
-                    <d
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-value">ETB ${campaign.budget || 0}</span>
+                            <span class="stat-label">Budget</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">${campaign.applications?.length || 0}</span>
+                            <span class="stat-label">Applications</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span>Deadline: ${campaign.deadline ? new Date(campaign.deadline).toLocaleDateString() : 'N/A'}</span>
+                    <button class="btn btn-primary btn-sm">Apply Now</button>
+                </div>
+            `;
+            campaignGrid.appendChild(card);
+        });
+
+        const pagination = document.createElement('div');
+        pagination.className = 'pagination';
+        pagination.innerHTML = `
+            <button onclick="loadCampaigns(${data.page - 1})" ${data.page === 1 ? 'disabled' : ''}>Previous</button>
+            <span>Page ${data.page} of ${data.pages || 1}</span>
+            <button onclick="loadCampaigns(${data.page + 1})" ${data.page === data.pages ? 'disabled' : ''}>Next</button>
+        `;
+        campaignGrid.appendChild(pagination);
+        console.log('[loadCampaigns] Campaigns rendered successfully');
+    } catch (error) {
+        console.error('[loadCampaigns] Error:', error);
+        if (data && data.error) {
+            campaignGrid.innerHTML = `<p>Error loading campaigns: ${data.error}. Please try again.</p>`;
+        } else {
+            campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again. Details: ' + error.message + '</p>';
+        }
+        alert('Error loading campaigns: ' + (data?.error || error.message));
+    }
+}
+
+    // Attach tab listeners
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            console.log('Tab clicked:', tab.textContent);
+            switchTab(tab.textContent.toLowerCase().replace(' ', '-'));
+        });
+    });
+
+    // Initialize
+    updateAuthButtons();
+    loadCampaigns();
+});
