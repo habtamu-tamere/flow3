@@ -376,36 +376,41 @@ const response = { ok: true, status: 200 };
 
 
 
-
 // Replace the loadCampaigns function in public/scripts.js
 async function loadCampaigns(page = 1) {
-    console.log('[loadCampaigns] Starting, page:', page);
+    console.log('[loadCampaigns] Starting, page:', page, 'at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
     const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
     if (!campaignGrid) {
         console.error('[loadCampaigns] Campaign grid not found in DOM');
         alert('Error: Campaign grid not found. Please check the page structure.');
         return;
     }
-    console.log('[loadCampaigns] Campaign grid found, clearing content');
+    console.log('[loadCampaigns] Campaign grid found, setting loading state');
     campaignGrid.innerHTML = '<p>Loading campaigns...</p>';
 
     try {
-        console.log('[loadCampaigns] Fetching /api/campaigns?page=', page);
+        console.log('[loadCampaigns] Initiating fetch to /api/campaigns?page=', page);
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10-second timeout
+        const timeoutId = setTimeout(() => {
+            console.log('[loadCampaigns] Fetch timed out after 10 seconds');
+            controller.abort();
+        }, 10000); // 10-second timeout
         const response = await fetch(`/api/campaigns?page=${page}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             signal: controller.signal
         });
         clearTimeout(timeoutId);
-        console.log('[loadCampaigns] Fetch response status:', response.status, response.statusText);
+        console.log('[loadCampaigns] Fetch completed, status:', response.status, response.statusText);
+
+        if (!response.ok) {
+            throw new Error(`[loadCampaigns] API error: ${response.status} - ${response.statusText}`);
+        }
+
+        console.log('[loadCampaigns] Parsing response JSON');
         const data = await response.json();
         console.log('[loadCampaigns] Raw API response:', JSON.stringify(data, null, 2));
 
-        if (!response.ok) {
-            throw new Error(`[loadCampaigns] API error: ${data.message || `HTTP ${response.status}: ${response.statusText}`}`);
-        }
         if (!data || typeof data !== 'object' || !Array.isArray(data.campaigns)) {
             throw new Error('[loadCampaigns] Invalid API response: campaigns array missing or not an array. Response:', JSON.stringify(data));
         }
@@ -460,18 +465,13 @@ async function loadCampaigns(page = 1) {
             <button onclick="loadCampaigns(${data.page + 1})" ${data.page === data.pages ? 'disabled' : ''}>Next</button>
         `;
         campaignGrid.appendChild(pagination);
-        console.log('[loadCampaigns] Campaigns rendered successfully');
+        console.log('[loadCampaigns] Campaigns rendered successfully at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
     } catch (error) {
-        console.error('[loadCampaigns] Error:', error);
-        if (data && data.error) {
-            campaignGrid.innerHTML = `<p>Error loading campaigns: ${data.error}. Please try again.</p>`;
-        } else {
-            campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again. Details: ' + error.message + '</p>';
-        }
-        alert('Error loading campaigns: ' + (data?.error || error.message));
+        console.error('[loadCampaigns] Error caught at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }), error);
+        campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again. Details: ' + error.message + '</p>';
+        alert('Error loading campaigns: ' + error.message);
     }
 }
-
     // Attach tab listeners
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
