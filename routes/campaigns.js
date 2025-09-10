@@ -5,7 +5,6 @@ const { body, query, validationResult } = require('express-validator');
 const auth = require('../middleware/auth');
 const Campaign = require('../models/Campaign');
 const Payment = require('../models/Payment');
-const axios = require('axios');
 
 router.post('/', auth, [
     body('title').notEmpty().withMessage('Title is required'),
@@ -19,7 +18,6 @@ router.post('/', auth, [
     console.log('POST /api/campaigns', req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log('Validation errors:', errors.array());
         return res.status(400).json({ errors: errors.array() });
     }
     const { title, description, industry, budget, tiktokUrl, performanceModel, deadline } = req.body;
@@ -30,14 +28,11 @@ router.post('/', auth, [
         await campaign.save();
         const commission = budget * (process.env.ADMIN_COMMISSION_RATE || 0.1);
         const totalAmount = Number(budget) + commission;
-        // Mock Telebirr payment
-        const paymentResponse = { data: { transactionId: 'mock123', paymentUrl: 'https://mock.telebirr.com/pay' } };
         const payment = new Payment({
-            campaign: campaign._id, user: req.user.id, amount: totalAmount, commission, telebirrTransactionId: paymentResponse.data.transactionId
+            campaign: campaign._id, user: req.user.id, amount: totalAmount, commission, telebirrTransactionId: 'mock123'
         });
         await payment.save();
-        console.log('Campaign created:', campaign._id);
-        res.json({ paymentUrl: paymentResponse.data.paymentUrl });
+        res.json({ paymentUrl: 'https://mock.telebirr.com/pay' });
     } catch (error) {
         console.error('Campaign creation error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
@@ -61,9 +56,9 @@ router.get('/', async (req, res) => {
             .populate('creator', 'name tiktokUrl')
             .skip((page - 1) * limit)
             .limit(Number(limit))
-            .lean(); // Use lean for faster queries
+            .lean();
         const total = await Campaign.countDocuments(query);
-        console.log('Campaigns fetched:', campaigns.length, 'Total:', total, 'Response:', { campaigns, total, page: Number(page), pages: Math.ceil(total / limit) });
+        console.log('GET /api/campaigns response:', { campaigns: campaigns || [], total: total || 0, page: Number(page), pages: Math.ceil(total / limit) || 1 });
         res.json({
             campaigns: campaigns || [],
             total: total || 0,
