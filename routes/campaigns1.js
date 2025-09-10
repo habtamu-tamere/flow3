@@ -7,6 +7,7 @@ const Campaign = require('../models/Campaign');
 const Payment = require('../models/Payment');
 const axios = require('axios');
 
+// Create campaign
 router.post('/', auth, [
     body('title').notEmpty().withMessage('Title is required'),
     body('description').notEmpty().withMessage('Description is required'),
@@ -16,63 +17,77 @@ router.post('/', auth, [
     body('performanceModel').isIn(['cpa', 'cpc', 'cpe', 'fixed']).withMessage('Invalid performance model'),
     body('deadline').isISO8601().toDate().withMessage('Valid deadline is required')
 ], async (req, res) => {
-    console.log('POST /api/campaigns', req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log('Validation errors:', errors.array());
         return res.status(400).json({ errors: errors.array() });
     }
+
     const { title, description, industry, budget, tiktokUrl, performanceModel, deadline } = req.body;
+
     try {
         const campaign = new Campaign({
-            title, description, industry, budget, tiktokUrl, performanceModel, deadline, creator: req.user.id
+            title,
+            description,
+            industry,
+            budget,
+            tiktokUrl,
+            performanceModel,
+            deadline,
+            creator: req.user.id
         });
         await campaign.save();
-        const commission = budget * (process.env.ADMIN_COMMISSION_RATE || 0.1);
-        const totalAmount = Number(budget) + commission;
-        // Mock Telebirr payment
-        const paymentResponse = { data: { transactionId: 'mock123', paymentUrl: 'https://mock.telebirr.com/pay' } };
+
+        // Calculate commission
+        const commission = budget * process.env.ADMIN_COMMISSION_RATE;
+        const totalAmount = budget + commission;
+
+        // Initiate Telebirr payment
+        const paymentResponse = await axios.post(
+            `${process.env.TELEBIRR_API_URL}/payment`,
+            {
+                amount: totalAmount,
+                currency: 'ETB',
+                description: `Campaign: ${title}`,
+                userId: req.user.id
+            },
+            { headers: { 'Authorization': `Bearer ${process.env.TELEBIRR_API_KEY}` } }
+        );
+
         const payment = new Payment({
-            campaign: campaign._id, user: req.user.id, amount: totalAmount, commission, telebirrTransactionId: paymentResponse.data.transactionId
+            campaign: campaign._id,
+            user: req.user.id,
+            amount: totalAmount,
+            commission,
+            telebirrTransactionId: paymentResponse.data.transactionId
         });
         await payment.save();
-        console.log('Campaign created:', campaign._id);
+
         res.json({ paymentUrl: paymentResponse.data.paymentUrl });
     } catch (error) {
-        console.error('Campaign creation error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
+// Get campaigns with filters
 router.get('/', async (req, res) => {
-    console.log('GET /api/campaigns', req.query);
-    const { industry, budget, performance, page = 1, limit = 10 } = req.query;
+    const { industry, budget, performance } = req.query;
     const query = {};
+
     if (industry) query.industry = industry;
     if (performance) query.performanceModel = performance;
     if (budget) {
-        if (budget === 'micro') query.budget = { $lte: 15000 };
-        if (budget === 'small') query.budget = { $gte: 15000, $lte: 100000 };
-        if (budget === 'medium') query.budget = { $gte: 100000, $lte: 300000 };
-        if (budget === 'large') query.budget = { $gte: 300000 };
+        if (budget === 'micro') query.budget = { $lte: 100 };
+        if (budget === 'small') query.budget = { $gte: 100, $lte: 500 };
+        if (budget === 'medium') query.budget = { $gte: 500, $lte: 2000 };
+        if (budget === 'large') query.budget = { $gte: 2000 };
     }
+
     try {
-        const campaigns = await Campaign.find(query)
-            .populate('creator', 'name tiktokUrl')
-            .skip((page - 1) * limit)
-            .limit(Number(limit))
-            .lean(); // Use lean for faster queries
-        const total = await Campaign.countDocuments(query);
-        console.log('Campaigns fetched:', campaigns.length, 'Total:', total, 'Response:', { campaigns, total, page: Number(page), pages: Math.ceil(total / limit) });
-        res.json({
-            campaigns: campaigns || [],
-            total: total || 0,
-            page: Number(page),
-            pages: Math.ceil(total / limit) || 1
-        });
+        const campaigns = await Campaign.find(query).populate('creator', 'name tiktokUrl');
+        res.json(campaigns);
     } catch (error) {
-        console.error('Get campaigns error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
