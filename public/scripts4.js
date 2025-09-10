@@ -535,6 +535,16 @@ async function loadCampaigns(page = 1) {
 
 
 
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
+    updateAuthButtons();
+    loadCampaigns(); // Initial load
+});
+
+
+
+
+
     // Attach tab listeners
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
