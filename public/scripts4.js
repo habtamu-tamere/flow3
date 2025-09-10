@@ -382,14 +382,14 @@ async function loadCampaigns(page = 1) {
     const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
     if (!campaignGrid) {
         console.error('[loadCampaigns] Campaign grid not found in DOM');
-        alert('Error: Campaign grid not found. Please check the page structure.');
+        campaignGrid.innerHTML = '<p>Error: Campaign grid not found. Please reload the page.</p>';
         return;
     }
-    console.log('[loadCampaigns] Campaign grid found, setting loading state');
+    console.log('[loadCampaigns] Setting loading state');
     campaignGrid.innerHTML = '<p>Loading campaigns...</p>';
 
     try {
-        console.log('[loadCampaigns] Initiating fetch to /api/campaigns?page=', page);
+        console.log('[loadCampaigns] Fetching /api/campaigns?page=', page);
         const controller = new AbortController();
         const timeoutId = setTimeout(() => {
             console.log('[loadCampaigns] Fetch timed out after 10 seconds');
@@ -407,7 +407,6 @@ async function loadCampaigns(page = 1) {
             throw new Error(`[loadCampaigns] API error: ${response.status} - ${response.statusText}`);
         }
 
-        console.log('[loadCampaigns] Parsing response JSON');
         const data = await response.json();
         console.log('[loadCampaigns] Raw API response:', JSON.stringify(data, null, 2));
 
@@ -465,13 +464,9 @@ async function loadCampaigns(page = 1) {
             <button onclick="loadCampaigns(${data.page + 1})" ${data.page === data.pages ? 'disabled' : ''}>Next</button>
         `;
         campaignGrid.appendChild(pagination);
-        console.log('[loadCampaigns] Campaigns rendered successfully at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
-    } catch (error) {
-        console.error('[loadCampaigns] Error caught at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }), error);
-        campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again. Details: ' + error.message + '</p>';
-        alert('Error loading campaigns: ' + error.message);
-    }
-}
+        console.log('[loadCampaigns] Campaigns rendered successfully at', new Date().to
+
+
     // Attach tab listeners
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
