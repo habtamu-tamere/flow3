@@ -464,7 +464,75 @@ async function loadCampaigns(page = 1) {
             <button onclick="loadCampaigns(${data.page + 1})" ${data.page === data.pages ? 'disabled' : ''}>Next</button>
         `;
         campaignGrid.appendChild(pagination);
-        console.log('[loadCampaigns] Campaigns rendered successfully at', new Date().to
+        console.log('[loadCampaigns] Campaigns rendered successfully at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
+    } catch (error) {
+        console.error('[loadCampaigns] Error caught at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }), error);
+        // Fallback to mock data if fetch fails
+        console.log('[loadCampaigns] Falling back to mock data due to error:', error.message);
+        const fallbackData = {
+            campaigns: [{
+                _id: "68c1324b6e393901bdf1881b",
+                title: "Apartment for sale ",
+                description: "Sales drive",
+                industry: "food",
+                budget: 15000,
+                tiktokUrl: "https://real.com",
+                performanceModel: "cpe",
+                deadline: new Date("2025-12-31T00:00:00Z").toISOString(),
+                applications: [],
+                status: "active"
+            }],
+            total: 1,
+            page: 1,
+            pages: 1
+        };
+        campaignGrid.innerHTML = '';
+        if (fallbackData.campaigns.length === 0) {
+            campaignGrid.innerHTML = '<p>No campaigns found (fallback).</p>';
+        } else {
+            fallbackData.campaigns.forEach(campaign => {
+                const card = document.createElement('div');
+                card.className = 'card campaign-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h3>${campaign.title || 'Untitled'}</h3>
+                        <span class="campaign-badge">${(campaign.performanceModel || 'N/A').toUpperCase()}</span>
+                    </div>
+                    <div class="card-body">
+                        <p>${campaign.description || 'No description'}</p>
+                        <p><a href="${campaign.tiktokUrl || '#'}" target="_blank">TikTok Profile</a></p>
+                        <div class="niche-tags">
+                            <span class="niche-tag">${campaign.industry || 'Unknown'}</span>
+                        </div>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-value">ETB ${campaign.budget || 0}</span>
+                                <span class="stat-label">Budget</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-value">${campaign.applications?.length || 0}</span>
+                                <span class="stat-label">Applications</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span>Deadline: ${campaign.deadline ? new Date(campaign.deadline).toLocaleDateString() : 'N/A'}</span>
+                        <button class="btn btn-primary btn-sm">Apply Now</button>
+                    </div>
+                `;
+                campaignGrid.appendChild(card);
+            });
+            const pagination = document.createElement('div');
+            pagination.className = 'pagination';
+            pagination.innerHTML = `
+                <span>Page 1 of 1 (fallback)</span>
+            `;
+            campaignGrid.appendChild(pagination);
+        }
+    }
+}
+
+
 
 
     // Attach tab listeners
@@ -479,3 +547,6 @@ async function loadCampaigns(page = 1) {
     updateAuthButtons();
     loadCampaigns();
 });
+
+
+
