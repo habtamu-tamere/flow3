@@ -56,10 +56,24 @@ router.get('/', async (req, res) => {
             .populate('creator', 'name tiktokUrl')
             .skip((page - 1) * limit)
             .limit(Number(limit))
-            .lean();
+            .lean()
+            .exec();
+        // Transform MongoDB extended JSON to plain JSON
+        const plainCampaigns = campaigns.map(campaign => ({
+            ...campaign,
+            _id: campaign._id.toString(),
+            budget: Number(campaign.budget),
+            deadline: campaign.deadline ? new Date(campaign.deadline).toISOString() : null,
+            createdAt: campaign.createdAt ? new Date(campaign.createdAt).toISOString() : null,
+            creator: {
+                _id: campaign.creator._id.toString(),
+                name: campaign.creator.name,
+                tiktokUrl: campaign.creator.tiktokUrl
+            }
+        }));
         const total = await Campaign.countDocuments(query);
         const response = {
-            campaigns: campaigns || [],
+            campaigns: plainCampaigns,
             total: total || 0,
             page: Number(page),
             pages: Math.ceil(total / limit) || 1
