@@ -423,4 +423,25 @@ document.addEventListener('DOMContentLoaded', () => {
             pagination.innerHTML = `
                 <button onclick="loadCampaigns(${data.page - 1})" ${data.page === 1 ? 'disabled' : ''}>Previous</button>
                 <span>Page ${data.page} of ${data.pages || 1}</span>
-                <button onclick="loadCampaigns(${data.page + 1})" ${data.page === data.pages ? 'di
+                <button onclick="loadCampaigns(${data.page + 1})" ${data.page === data.pages ? 'disabled' : ''}>Next</button>
+            `;
+            campaignGrid.appendChild(pagination);
+        } catch (error) {
+            console.error('Error loading campaigns:', error);
+            campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again.</p>';
+            alert('Error loading campaigns: ' + error.message);
+        }
+    }
+
+    // Attach tab listeners
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            console.log('Tab clicked:', tab.textContent);
+            switchTab(tab.textContent.toLowerCase().replace(' ', '-')); // Handle 'Video Editors'
+        });
+    });
+
+    // Initialize
+    updateAuthButtons();
+    loadCampaigns();
+});
