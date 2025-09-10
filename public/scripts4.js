@@ -71,23 +71,27 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(campaignModal);
     console.log('Campaign modal appended to DOM');
 
-    // Helper function for API calls
-    async function fetchWithErrorHandling(url, options) {
-        try {
-            console.log(`Fetching ${url} with options:`, options);
-            const response = await fetch(url, options);
-            console.log(`Response from ${url}:`, response.status, response.statusText);
-            const result = await response.json();
-            console.log(`Result from ${url}:`, result);
-            if (!response.ok) {
-                throw new Error(result.message || `HTTP ${response.status}: ${response.statusText}`);
-            }
-            return result;
-        } catch (error) {
-            console.error(`Error fetching ${url}:`, error);
-            throw error;
-        }
-    }
+    const data = {
+    campaigns: [{
+        _id: "68c1324b6e393901bdf1881b",
+        title: "Apartment for sale ",
+        description: "Sales drive",
+        industry: "food",
+        budget: 15000,
+        tiktokUrl: "https://real.com",
+        performanceModel: "cpe",
+        deadline: new Date("2025-12-31T00:00:00Z").toISOString(),
+        applications: [],
+        status: "active"
+    }],
+    total: 1,
+    page: 1,
+    pages: 1
+};
+const response = { ok: true, status: 200 };
+// Skip to data processing...
+
+
 
     // Check if elements exist
     if (!loginBtn) console.error('loginBtn not found');
