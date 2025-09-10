@@ -71,26 +71,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(campaignModal);
     console.log('Campaign modal appended to DOM');
 
-    // Helper function for API calls
- const data = {
-    campaigns: [{
-        _id: "68c1324b6e393901bdf1881b",
-        title: "Apartment for sale ",
-        description: "Sales drive",
-        industry: "food",
-        budget: 15000,
-        tiktokUrl: "https://real.com",
-        performanceModel: "cpe",
-        deadline: new Date("2025-12-31T00:00:00Z").toISOString(),
-        applications: [],
-        status: "active"
-    }],
-    total: 1,
-    page: 1,
-    pages: 1
-};
-const response = { ok: true, status: 200 };
-// Skip to data processing...
+//     // Helper function for API calls
+//  const data = {
+//     campaigns: [{
+//         _id: "68c1324b6e393901bdf1881b",
+//         title: "Apartment for sale ",
+//         description: "Sales drive",
+//         industry: "food",
+//         budget: 15000,
+//         tiktokUrl: "https://real.com",
+//         performanceModel: "cpe",
+//         deadline: new Date("2025-12-31T00:00:00Z").toISOString(),
+//         applications: [],
+//         status: "active"
+//     }],
+//     total: 1,
+//     page: 1,
+//     pages: 1
+// };
+// const response = { ok: true, status: 200 };
+// // Skip to data processing...
 
     // Check if elements exist
     if (!loginBtn) console.error('loginBtn not found');
