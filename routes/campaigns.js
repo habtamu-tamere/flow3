@@ -39,6 +39,8 @@ router.post('/', auth, [
     }
 });
 
+
+// Update the GET route in src/routes/campaigns.js
 router.get('/', async (req, res) => {
     console.log('GET /api/campaigns', req.query);
     const { industry, budget, performance, page = 1, limit = 10 } = req.query;
