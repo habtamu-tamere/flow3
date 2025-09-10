@@ -58,18 +58,17 @@ router.get('/', async (req, res) => {
             .limit(Number(limit))
             .lean()
             .exec();
-        // Transform MongoDB extended JSON to plain JSON
         const plainCampaigns = campaigns.map(campaign => ({
             ...campaign,
             _id: campaign._id.toString(),
             budget: Number(campaign.budget),
             deadline: campaign.deadline ? new Date(campaign.deadline).toISOString() : null,
             createdAt: campaign.createdAt ? new Date(campaign.createdAt).toISOString() : null,
-            creator: {
+            creator: campaign.creator ? {
                 _id: campaign.creator._id.toString(),
                 name: campaign.creator.name,
                 tiktokUrl: campaign.creator.tiktokUrl
-            }
+            } : null
         }));
         const total = await Campaign.countDocuments(query);
         const response = {
@@ -82,15 +81,13 @@ router.get('/', async (req, res) => {
         res.json(response);
     } catch (error) {
         console.error('Get campaigns error:', error);
-        const errorResponse = {
+        res.status(500).json({
             campaigns: [],
             total: 0,
             page: Number(page),
             pages: 1,
             error: error.message
-        };
-        console.log('GET /api/campaigns error response:', JSON.stringify(errorResponse, null, 2));
-        res.status(500).json(errorResponse);
+        });
     }
 });
 
