@@ -381,11 +381,11 @@ async function loadCampaigns(page = 1) {
     const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
     if (!campaignGrid) {
         console.error('[loadCampaigns] Campaign grid not found in DOM at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
-        document.body.innerHTML = '<h1>Error: Campaign grid not found. Please check HTML structure.</h1>';
+        campaignGrid.innerHTML = '<p>Error: Campaign grid not found. Please reload the page.</p>';
         return;
     }
     console.log('[loadCampaigns] Campaign grid found, setting loading state at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
-    campaignGrid.innerHTML = '<p>Diagnosing campaigns... (Check console for details)</p>';
+    campaignGrid.innerHTML = '<p>Loading campaigns...</p>';
 
     try {
         console.log('[loadCampaigns] Attempting fetch to /api/campaigns?page=', page, 'at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
@@ -408,14 +408,72 @@ async function loadCampaigns(page = 1) {
         const data = await response.json();
         console.log('[loadCampaigns] Raw API response:', JSON.stringify(data, null, 2), 'at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
 
-        if (!data || typeof data !== 'object' || !Array.isArray(data.campaigns)) {
-            throw new Error('[loadCampaigns] Invalid API response: campaigns array missing or not an array. Response:', JSON.stringify(data), 'at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
+        // Handle both plain array and object with campaigns property
+        let campaigns = [];
+        if (Array.isArray(data)) {
+            console.log('[loadCampaigns] Detected plain array response, using as campaigns');
+            campaigns = data;
+        } else if (data && typeof data === 'object' && Array.isArray(data.campaigns)) {
+            console.log('[loadCampaigns] Detected object with campaigns property');
+            campaigns = data.campaigns;
+        } else {
+            throw new Error('[loadCampaigns] Invalid API response format at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
         }
 
-        campaignGrid.innerHTML = `<p>Fetch succeeded! Check console for response at ${new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' })}</p>`;
+        campaignGrid.innerHTML = '';
+        if (campaigns.length === 0) {
+            console.log('[loadCampaigns] No campaigns returned at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
+            campaignGrid.innerHTML = '<p>No campaigns found.</p>';
+            return;
+        }
+
+        console.log('[loadCampaigns] Processing', campaigns.length, 'campaigns at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
+        campaigns.forEach(campaign => {
+            console.log('[loadCampaigns] Processing campaign:', JSON.stringify(campaign));
+            const card = document.createElement('div');
+            card.className = 'card campaign-card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <h3>${campaign.title || 'Untitled'}</h3>
+                    <span class="campaign-badge">${(campaign.performanceModel || 'N/A').toUpperCase()}</span>
+                </div>
+                <div class="card-body">
+                    <p>${campaign.description || 'No description'}</p>
+                    <p><a href="${campaign.tiktokUrl || '#'}" target="_blank">TikTok Profile</a></p>
+                    <div class="niche-tags">
+                        <span class="niche-tag">${campaign.industry || 'Unknown'}</span>
+                    </div>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-value">ETB ${campaign.budget || 0}</span>
+                            <span class="stat-label">Budget</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">${campaign.applications?.length || 0}</span>
+                            <span class="stat-label">Applications</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span>Deadline: ${campaign.deadline ? new Date(campaign.deadline).toLocaleDateString() : 'N/A'}</span>
+                    <button class="btn btn-primary btn-sm">Apply Now</button>
+                </div>
+            `;
+            campaignGrid.appendChild(card);
+        });
+
+        const pagination = document.createElement('div');
+        pagination.className = 'pagination';
+        pagination.innerHTML = `
+            <button onclick="loadCampaigns(${page - 1})" ${page === 1 ? 'disabled' : ''}>Previous</button>
+            <span>Page ${page} of 1</span>
+            <button onclick="loadCampaigns(${page + 1})" disabled>Next</button>
+        `;
+        campaignGrid.appendChild(pagination);
+        console.log('[loadCampaigns] Campaigns rendered successfully at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }));
     } catch (error) {
         console.error('[loadCampaigns] Error caught at', new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' }), error);
-        campaignGrid.innerHTML = `<p>Error loading campaigns at ${new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' })}. Details: ${error.message}. Check console.</p>`;
+        campaignGrid.innerHTML = `<p>Error loading campaigns at ${new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Addis_Ababa' })}. Details: ${error.message}</p>`;
     }
 }
 
