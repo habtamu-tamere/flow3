@@ -24,7 +24,7 @@ app.use('/api/payments', paymentRoutes);
 
 // Serve index.html for all other routes
 app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/public/index2.html');
 });
 
 const PORT = process.env.PORT || 3000;
