@@ -371,6 +371,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+const data = {
+    campaigns: [{
+        _id: "68c1324b6e393901bdf1881b",
+        title: "Apartment for sale ",
+        description: "Sales drive",
+        industry: "food",
+        budget: 15000,
+        tiktokUrl: "https://real.com",
+        performanceModel: "cpe",
+        deadline: new Date("2025-12-31T00:00:00Z").toISOString(),
+        applications: [],
+        status: "active"
+    }],
+    total: 1,
+    page: 1,
+    pages: 1
+};
+campaignGrid.innerHTML = '';
+data.campaigns.forEach(campaign => { /* same card creation as above */ });
+
+
+
+
+
+
 // Replace the loadCampaigns function in public/scripts.js
 async function loadCampaigns(page = 1) {
     console.log('[loadCampaigns] Starting, page:', page);
