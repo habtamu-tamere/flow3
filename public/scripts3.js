@@ -76,16 +76,15 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             console.log(`Fetching ${url} with options:`, options);
             const response = await fetch(url, options);
-            console.log(`Response from ${url}:`, response.status);
+            console.log(`Response from ${url}:`, response.status, response.statusText);
             const result = await response.json();
             console.log(`Result from ${url}:`, result);
             if (!response.ok) {
-                throw new Error(result.message || `HTTP ${response.status}`);
+                throw new Error(result.message || `HTTP ${response.status}: ${response.statusText}`);
             }
             return result;
         } catch (error) {
             console.error(`Error fetching ${url}:`, error);
-            alert(`Error: ${error.message}`);
             throw error;
         }
     }
@@ -205,19 +204,21 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please fill in all fields');
             return;
         }
-        await fetchWithErrorHandling('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        }).then(result => {
+        try {
+            const result = await fetchWithErrorHandling('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
             localStorage.setItem('token', result.token);
             loginModal.style.display = 'none';
             updateAuthButtons();
             loadCampaigns();
             alert('Login successful');
-        }).catch(error => {
+        } catch (error) {
             console.error('Login failed:', error);
-        });
+            alert('Login failed: ' + error.message);
+        }
     });
 
     // Register submission
@@ -231,19 +232,21 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please fill in all fields');
             return;
         }
-        await fetchWithErrorHandling('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, role })
-        }).then(result => {
+        try {
+            const result = await fetchWithErrorHandling('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, role })
+            });
             localStorage.setItem('token', result.token);
             registerModal.style.display = 'none';
             updateAuthButtons();
             loadCampaigns();
             alert('Registration successful');
-        }).catch(error => {
+        } catch (error) {
             console.error('Registration failed:', error);
-        });
+            alert('Registration failed: ' + error.message);
+        }
     });
 
     // Campaign creation
@@ -260,21 +263,23 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please fill in all campaign fields');
             return;
         }
-        await fetchWithErrorHandling('/api/campaigns', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ title, description, industry, budget, tiktokUrl, performanceModel, deadline })
-        }).then(result => {
+        try {
+            const result = await fetchWithErrorHandling('/api/campaigns', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ title, description, industry, budget, tiktokUrl, performanceModel, deadline })
+            });
             campaignModal.style.display = 'none';
             alert('Campaign created! Redirecting to Telebirr payment...');
             // window.location.href = result.paymentUrl; // Mocked for testing
             loadCampaigns();
-        }).catch(error => {
+        } catch (error) {
             console.error('Campaign creation failed:', error);
-        });
+            alert('Campaign creation failed: ' + error.message);
+        }
     });
 
     // Apply campaign filters
@@ -283,11 +288,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const industry = document.getElementById('industry')?.value;
         const budget = document.getElementById('budget')?.value;
         const performance = document.getElementById('performance')?.value;
-        await fetchWithErrorHandling(`/api/campaigns?industry=${industry}&budget=${budget}&performance=${performance}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        }).then(data => {
+        try {
+            const data = await fetchWithErrorHandling(`/api/campaigns?industry=${industry}&budget=${budget}&performance=${performance}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
             const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
+            if (!campaignGrid) {
+                console.error('Campaign grid not found');
+                alert('Error: Campaign grid not found');
+                return;
+            }
             campaignGrid.innerHTML = '';
             if (!data.campaigns || !Array.isArray(data.campaigns) || data.campaigns.length === 0) {
                 campaignGrid.innerHTML = '<p>No campaigns found.</p>';
@@ -326,12 +337,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 campaignGrid.appendChild(card);
             });
-        }).catch(error => {
+        } catch (error) {
             console.error('Filter campaigns failed:', error);
-        });
+            const campaignGrid = document.querySelector('#campaigns-tab .card-grid');
+            campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again.</p>';
+            alert('Error loading filtered campaigns: ' + error.message);
+        }
     });
 
-    // Apply influencer filters (placeholder for future implementation)
+    // Apply influencer filters (placeholder)
     applyInfluencerFiltersBtn?.addEventListener('click', () => {
         console.log('Apply influencer filters clicked');
         alert('Influencer filters not yet implemented.');
@@ -371,13 +385,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
             });
-            console.log('Campaigns API response status:', response.status);
+            console.log('Campaigns API response status:', response.status, response.statusText);
             const data = await response.json();
             console.log('Raw API response:', data);
             if (!response.ok) {
-                throw new Error(data.message || `HTTP ${response.status}`);
+                throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
             }
-            if (!data.campaigns || !Array.isArray(data.campaigns)) {
+            if (!data || !data.campaigns || !Array.isArray(data.campaigns)) {
                 throw new Error('Invalid API response: campaigns array missing or not an array');
             }
             campaignGrid.innerHTML = '';
@@ -387,6 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             data.campaigns.forEach(campaign => {
+                console.log('Processing campaign:', campaign);
                 const card = document.createElement('div');
                 card.className = 'card campaign-card';
                 card.innerHTML = `
@@ -426,6 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button onclick="loadCampaigns(${data.page + 1})" ${data.page === data.pages ? 'disabled' : ''}>Next</button>
             `;
             campaignGrid.appendChild(pagination);
+            console.log('Campaigns rendered successfully');
         } catch (error) {
             console.error('Error loading campaigns:', error);
             campaignGrid.innerHTML = '<p>Error loading campaigns. Please try again.</p>';
@@ -437,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', (e) => {
             console.log('Tab clicked:', tab.textContent);
-            switchTab(tab.textContent.toLowerCase().replace(' ', '-')); // Handle 'Video Editors'
+            switchTab(tab.textContent.toLowerCase().replace(' ', '-'));
         });
     });
 
