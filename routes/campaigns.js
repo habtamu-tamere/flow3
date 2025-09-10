@@ -58,16 +58,25 @@ router.get('/', async (req, res) => {
             .limit(Number(limit))
             .lean();
         const total = await Campaign.countDocuments(query);
-        console.log('GET /api/campaigns response:', { campaigns: campaigns || [], total: total || 0, page: Number(page), pages: Math.ceil(total / limit) || 1 });
-        res.json({
+        const response = {
             campaigns: campaigns || [],
             total: total || 0,
             page: Number(page),
             pages: Math.ceil(total / limit) || 1
-        });
+        };
+        console.log('GET /api/campaigns response:', JSON.stringify(response, null, 2));
+        res.json(response);
     } catch (error) {
         console.error('Get campaigns error:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
+        const errorResponse = {
+            campaigns: [],
+            total: 0,
+            page: Number(page),
+            pages: 1,
+            error: error.message
+        };
+        console.log('GET /api/campaigns error response:', JSON.stringify(errorResponse, null, 2));
+        res.status(500).json(errorResponse);
     }
 });
 
